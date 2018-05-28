@@ -61,7 +61,7 @@ operandsFromString.append(re.findall('\d+', expression))     #faz uma lista com 
 operands = operandsFromString.pop()     #pega sub vetor e passa para vetor normal
 
 #agora que tenho prioridade de expressao devo implementar codigo para que faca operacoes de forma correta em assembly
-#para mais de duas operacoes. Tambem preciso implementar em assembly as expressoes fora dos parenteses.
+#para mais de duas operacoes. Tambem preciso implementar em assembly as expressoes fora dos parenteses e seja o que Deus quiser gente bouaaaa
 priority = (re.findall(r'\((.*?)\)', expression))
 print(priority)
 
