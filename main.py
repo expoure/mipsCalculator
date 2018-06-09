@@ -1,18 +1,22 @@
 import re
-
+import shuntingYardAlgorithm
 
 presentation = "Trabalho de arquitetura de computadores 1 - Dyonatha Kramer e Laerte Pack\n#Calculadora MIPS\n"
 print ("\n" + presentation)
 print ("Instruções:")
-print ("A calculadora realiza SOMA, SUBTRAÇÃO, MULTIPLICAÇÃO, DIVISÃO, RAIZ QUADRADA, POTENCIA, FATORIAL E FIBONACCI de "
+print ("A calculadora realiza SOMA, SUBTRAÇÃO, MULTIPLICAÇÃO, DIVISÃO, RAIZ QUADRADA, POTENCIA e FATORIAL de "
        "operadores do tipo INTEIRO")
 
-priority = []
+
 dataArray = []
 savedTemporary = ["$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7"]
+savedTemporaryUsed = []
 temporary = ["$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7"]
+temporaryUsed = []
+
 
 def dataWrite():     #essa funcao ira escrever no arquivo
+    count = 0
     file = open("calc.asm", "a+")
     file.write("\n.data\n")
     for i in range(0, len(operands)):
@@ -20,24 +24,127 @@ def dataWrite():     #essa funcao ira escrever no arquivo
         dataArray.append(az[0][i])
     file.write("\n.text\n\tmain:\n")    #adiciona a parte .text e main:
 
-    for i in range(0, len(operands)):
-        file.write("\t\tlw " + str(savedTemporary[i]) + ", " + str(dataArray.pop(0)) + "\n")    #faz load word e atribui o dado a um registrador
-
-    #preciso arrumar a estrutura para que as operacoes sejam feitas de forma correta
-
-        if operators[i] == "*":
-            file.write("\t\tmult " + str(temporary[i]) + ", " + str(savedTemporary.pop(0) + ", " + str(savedTemporary.pop(0))) + "\n")
-
-        if operators[i] == "/":
-            file.write("\t\tdiv " + str(temporary[i]) + ", " + str(savedTemporary.pop(0) + ", " + str(savedTemporary.pop(0))) + "\n")
+    #for i in range(0, len(operands)):
+    #    file.write("\t\tlw " + str(savedTemporary[i]) + ", " + str(dataArray.pop(0)) + "\n")    #faz load word e atribui o dado a um registrador
 
 
-    for i in range(0, len(operators) -1):
-        if operators[i] == "+":
-            file.write("\t\tadd " + str(temporary[i]) + ", " + str(savedTemporary.pop(0) + ", " + str(savedTemporary.pop(0))) + "\n")
+    for i in range(0, len(sya)):
+        if not sya[i].isnumeric():
+            #if sya[i] == "r":
 
-        if operators[i] == "-":
-            file.write("\t\tadd " + str(temporary[i]) + ", " + str(savedTemporary.pop(0) + ", " + str(savedTemporary.pop(0))) + "\n")
+            #if sya[i] == "f":
+
+            #if sya[i] == "^":
+
+            if sya[i] == "*":
+
+                if len(rpn) != 0:
+                    if rpn[0].isnumeric() and rpn[1].isnumeric():
+                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
+                        file.write("\t\tlw " + str(savedTemporary[1]) + ", " + str(dataArray.pop(0)) + "\n")
+                        temporaryUsed.append(temporary.pop(0))
+                        file.write("\t\tmul " + str(temporaryUsed[count]) + ", " + str(savedTemporary[0]) + ", " + str(
+                            savedTemporary[1]) + "\n")
+                        try:
+                            for j in range(i + 1, 0, -1):
+                                rpn.pop(0)
+                                print(str(rpn) + '*')
+                        except Exception:
+                            print('..')
+
+
+
+                    else:
+                        print(i)
+                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
+                        file.write("\t\tmul " + str(temporaryUsed[0]) + ", " + str(temporaryUsed[0]) + ", " + str(
+                            savedTemporary[0]) + "\n")
+                        for j in range(i, rpn[0], -1):
+                            rpn.pop(0)
+                            print(str(rpn) + '*')
+
+
+            if sya[i] == "/":
+                if len(rpn) != 0:
+                    if rpn[0].isnumeric() and rpn[1].isnumeric():
+                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
+                        file.write("\t\tlw " + str(savedTemporary[1]) + ", " + str(dataArray.pop(0)) + "\n")
+                        temporaryUsed.append(temporary.pop(0))
+                        file.write("\t\tdiv " + str(temporaryUsed[count]) + ", " + str(savedTemporary[0]) + ", " + str(
+                            savedTemporary[1]) + "\n")
+                        try:
+                            for j in range(i + 1, 0, -1):
+                                rpn.pop(0)
+                                print(str(rpn) + '/')
+                        except Exception:
+                            print('..')
+                        print('saiu')
+
+                    else:
+                        print(i)
+                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
+                        file.write("\t\tdiv " + str(temporaryUsed[0]) + ", " + str(temporaryUsed[0]) + ", " + str(
+                            savedTemporary[0]) + "\n")
+                        for j in range(i, rpn[0], -1):
+                            rpn.pop(0)
+                            print(str(rpn) + '/')
+
+            if sya[i] == "+":
+                if len(rpn) > 1:
+                    if rpn[0].isnumeric() and rpn[1].isnumeric():
+                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
+                        file.write("\t\tlw " + str(savedTemporary[1]) + ", " + str(dataArray.pop(0)) + "\n")
+                        temporaryUsed.append(temporary.pop(0))
+                        print(temporaryUsed)
+                        file.write("\t\tadd " + str(temporaryUsed[count]) + ", " + str(savedTemporary[0]) + ", " + str(
+                            savedTemporary[1]) + "\n")
+                        try:
+                            for j in range(i + 1, 0, -1):
+                                rpn.pop(0)
+                                print(str(rpn) + '+')
+                        except Exception:
+                            print('..')
+
+                    else:
+                        print(i)
+                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
+                        file.write("\t\tadd " + str(temporaryUsed[0]) + ", " + str(temporaryUsed[0]) + ", " + str(
+                            savedTemporary[0]) + "\n")
+                        for j in range(i, rpn[0], -1):
+                            rpn.pop(0)
+                if len(temporaryUsed) > 1:
+                    file.write("\t\tadd " + str(temporaryUsed[0]) + ", " + str(temporaryUsed.pop(0)) + ", " + str(
+                        temporaryUsed.pop(0)) + "\n")
+
+            if sya[i] == "-":
+                if len(rpn) > 1:
+                    if rpn[0].isnumeric() and rpn[1].isnumeric():
+                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
+                        file.write("\t\tlw " + str(savedTemporary[1]) + ", " + str(dataArray.pop(0)) + "\n")
+                        temporaryUsed.append(temporary.pop(0))
+                        file.write("\t\tsub " + str(temporaryUsed[count]) + ", " + str(savedTemporary[0]) + ", " + str(
+                            savedTemporary[1]) + "\n")
+                        try:
+                            for j in range(i + 1, 0, -1):
+                                rpn.pop(0)
+                                print(str(rpn) + '-')
+                        except Exception:
+                            print('..')
+
+                    else:
+                        print(i)
+                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
+                        file.write("\t\tsub " + str(temporaryUsed[0]) + ", " + str(temporaryUsed[0]) + ", " + str(
+                            savedTemporary[0]) + "\n")
+                        for j in range(i, rpn[0], -1):
+                            print(str(rpn) + '-')
+                            rpn.pop(0)
+                if len(temporaryUsed) > 1:
+                    file.write("\t\tsub " + str(temporaryUsed[0]) + ", " + str(temporaryUsed.pop(0)) + ", " + str(
+                        temporaryUsed.pop(0)) + "\n")
+            count += 1
+
+    file.write("\t\tli $v0, 1\n\t\tmove $a0, $t0\n\t\tsyscall")
     file.close()
 
 
@@ -49,19 +156,22 @@ operators = []  #lista dinamica dos operadores
 operators_index = []    #lista dinamica do indice dos operadores
 operandsFromString = []     #lista dinamica dos operandos
 az = ["abcdefghijklmnopqrstuvwxyz"]
-
+rpn = []
+exp = []
 expression = input("Entre com o calculo a ser realizado: ")
 
 
 for i in range(0, len(expression)):     #aqui ele 'escaneia' a string em busca de operadores
-    if not ((expression[i].isnumeric()) or (expression[i].isspace())):
+    if not ((expression[i].isnumeric()) or (expression[i].isspace()) or (expression[i] == "(") or (expression[i] == ")")):
         operators.append(expression[i])     #adiciona operadores na lista
         operators_index.append(i)       #adiciona o indice dos operadores na lista
 operandsFromString.append(re.findall('\d+', expression))     #faz uma lista com operandos
 operands = operandsFromString.pop()     #pega sub vetor e passa para vetor normal
 
-#agora que tenho prioridade de expressao devo implementar codigo para que faca operacoes de forma correta em assembly
-#para mais de duas operacoes. Tambem preciso implementar em assembly as expressoes fora dos parenteses e seja o que Deus quiser gente bouaaaa
-priority = (re.findall(r'\((.*?)\)', expression))
-print(priority)
 
+sya = shuntingYardAlgorithm.rpn(expression)
+
+for i in range(0, len(sya)):
+    rpn.append(sya[i])
+print(sya)
+dataWrite()
