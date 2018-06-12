@@ -7,20 +7,20 @@ print ("Instruções:")
 print ("A calculadora realiza SOMA, SUBTRAÇÃO, MULTIPLICAÇÃO, DIVISÃO, RAIZ QUADRADA, POTENCIA e FATORIAL de "
        "operadores do tipo INTEIRO")
 
-
+sizeArray = 0
+operandsInOrder = []
 dataArray = []
 savedTemporary = ["$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7"]
 savedTemporaryUsed = []
 temporary = ["$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7"]
 temporaryUsed = []
 
-
 def dataWrite():     #essa funcao ira escrever no arquivo
     count = 0
     file = open("calc.asm", "a+")
     file.write("\n.data\n")
     for i in range(0, len(operands)):
-        file.write("\t" + az[0][i] + ": .word " + str(operands[i]) + "\n")  #pega a letra do alfabeto de acordo com a necessidade e refere ao operando
+        file.write("\t" + az[0][i] + ": .word " + str(operandsInOrder[i]) + "\n")  #pega a letra do alfabeto de acordo com a necessidade e refere ao operando
         dataArray.append(az[0][i])
     file.write("\n.text\n\tmain:\n")    #adiciona a parte .text e main:
 
@@ -32,7 +32,15 @@ def dataWrite():     #essa funcao ira escrever no arquivo
         if not sya[i].isnumeric():
             #if sya[i] == "r":
 
-            #if sya[i] == "f":
+            if sya[i] == "f":
+                if len(rpn) != 0:
+                    if rpn[0].isnumeric():
+                        file.write("\t\tlw " + "$s0" + ", " + str(dataArray.pop(0)) + "\n")
+                        file.write("\t\taddi $s1,$zero, 1\n\t\taddi $s2,$zero, 2\n\t\tli $s3, 268500992\n\t\tadd $t2,$zero, $s1\n\t\tlw $t3, a\n\t\tadd $s4, $s0, $s1"
+                                   "\n\t\tslt $t0,$s0,$s2\n\t\t\tbeq $t0,$zero,LOOP\n\t\t\tj LSair"
+                                   "\nLOOP:\n\t\taddi $t4, $t4, 1\n\t\t\tslt $t0, $t4, $s4\n\t\t\tbeq $t0, $zero, LSair\n\t\tmul $t2, $t2, $t4"
+                                   "\n\t\tj LOOP\nLSair:\n\t\tsw $t2, ($s3)\n\t\tli $v0, 1\n\t\tmove $a0, $t2\n\t\tsyscall")
+                        exit()
 
             #if sya[i] == "^":
 
@@ -59,7 +67,8 @@ def dataWrite():     #essa funcao ira escrever no arquivo
                         file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
                         file.write("\t\tmul " + str(temporaryUsed[0]) + ", " + str(temporaryUsed[0]) + ", " + str(
                             savedTemporary[0]) + "\n")
-                        for j in range(i, rpn[0], -1):
+                        sizeArray = len(rpn)
+                        for j in range(i, sizeArray, -1):      #for j in range(i, rpn[0], -1):
                             rpn.pop(0)
                             print(str(rpn) + '*')
 
@@ -85,7 +94,8 @@ def dataWrite():     #essa funcao ira escrever no arquivo
                         file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
                         file.write("\t\tdiv " + str(temporaryUsed[0]) + ", " + str(temporaryUsed[0]) + ", " + str(
                             savedTemporary[0]) + "\n")
-                        for j in range(i, rpn[0], -1):
+                        sizeArray = len(rpn)
+                        for j in range(i, sizeArray, -1):      #for j in range(i, rpn[0], -1):
                             rpn.pop(0)
                             print(str(rpn) + '/')
 
@@ -110,7 +120,8 @@ def dataWrite():     #essa funcao ira escrever no arquivo
                         file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
                         file.write("\t\tadd " + str(temporaryUsed[0]) + ", " + str(temporaryUsed[0]) + ", " + str(
                             savedTemporary[0]) + "\n")
-                        for j in range(i, rpn[0], -1):
+                        sizeArray = len(rpn)
+                        for j in range(i, sizeArray, -1):      #for j in range(i, rpn[0], -1):
                             rpn.pop(0)
                 if len(temporaryUsed) > 1:
                     file.write("\t\tadd " + str(temporaryUsed[0]) + ", " + str(temporaryUsed.pop(0)) + ", " + str(
@@ -136,7 +147,8 @@ def dataWrite():     #essa funcao ira escrever no arquivo
                         file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
                         file.write("\t\tsub " + str(temporaryUsed[0]) + ", " + str(temporaryUsed[0]) + ", " + str(
                             savedTemporary[0]) + "\n")
-                        for j in range(i, rpn[0], -1):
+                        sizeArray = len(rpn)
+                        for j in range(i, sizeArray, -1):      #for j in range(i, rpn[0], -1):
                             print(str(rpn) + '-')
                             rpn.pop(0)
                 if len(temporaryUsed) > 1:
@@ -173,5 +185,9 @@ sya = shuntingYardAlgorithm.rpn(expression)
 
 for i in range(0, len(sya)):
     rpn.append(sya[i])
-print(sya)
+
+for i in range(0, len(rpn)):
+    if rpn[i].isnumeric():
+        operandsInOrder.append(rpn[i])
+print(rpn)
 dataWrite()
