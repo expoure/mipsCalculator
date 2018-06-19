@@ -6,7 +6,7 @@ import shuntingYardAlgorithm
 presentation = "Trabalho de arquitetura de computadores 1 - Dyonatha Kramer e Laerte Pack\n#Calculadora MIPS\n"
 print ("\n" + presentation)
 print ("Instruções:")
-print ("A calculadora realiza SOMA, SUBTRAÇÃO, MULTIPLICAÇÃO, DIVISÃO, RAIZ QUADRADA, POTENCIA e FATORIAL de "
+print ("A calculadora realiza SOMA, SUBTRAÇÃO, MULTIPLICAÇÃO, DIVISÃO, POTENCIA e FATORIAL de "
        "operadores do tipo INTEIRO")
 
 sizeArray = 0
@@ -45,7 +45,13 @@ def dataWrite():     #essa funcao ira escrever no arquivo
                                    "\n\t\tj LOOP\nLSair:\n\t\tsw $t2, ($s3)\n\t\tli $v0, 1\n\t\tmove $a0, $t2\n\t\tsyscall")
                         exit()
 
-            #if sya[i] == "^":
+            if sya[i] == "^":
+                if len(rpn) != 0:
+                    if rpn[i-1].isnumeric() and rpn[i-2].isnumeric():
+                        file.write("\t\tlw " + "$s0" + ", " + str(dataArray.pop(0)) + "\n\t\tlw $s1, " + str(dataArray.pop(0)))
+                        file.write("\n\t\taddi $t0,$s0, 0\n\t\taddi $t1,$zero, 0\n\twhile:\n\t\tblt $s1, 2, exit\n\t\tsubi $s1, $s1, 1"
+                                   "\n\t\tmul $t0, $t0, $s0\n\t\tj while\n\texit:\n\t\tli $v0, 1\n\t\tmove $a0, $t0\n\t\tsyscall")
+                        exit()
 
             if sya[i] == "*":
                 print(str(rpn) + '*')

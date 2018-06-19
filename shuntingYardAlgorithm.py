@@ -10,7 +10,6 @@ Op = collections.namedtuple('Op', [
     'associativity'])
 
 OPS = {
-    'r': Op(precedence=4, associativity=RIGHT),
     'f': Op(precedence=4, associativity=RIGHT),
     '^': Op(precedence=4, associativity=RIGHT),
     '*': Op(precedence=3, associativity=LEFT),
