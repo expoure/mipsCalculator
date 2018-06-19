@@ -1,6 +1,8 @@
 import re
 import shuntingYardAlgorithm
 
+
+
 presentation = "Trabalho de arquitetura de computadores 1 - Dyonatha Kramer e Laerte Pack\n#Calculadora MIPS\n"
 print ("\n" + presentation)
 print ("Instruções:")
@@ -16,6 +18,7 @@ temporary = ["$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7"]
 temporaryUsed = []
 
 def dataWrite():     #essa funcao ira escrever no arquivo
+    poped = 0
     count = 0
     file = open("calc.asm", "a+")
     file.write("\n.data\n")
@@ -45,17 +48,19 @@ def dataWrite():     #essa funcao ira escrever no arquivo
             #if sya[i] == "^":
 
             if sya[i] == "*":
-
+                print(str(rpn) + '*')
                 if len(rpn) != 0:
-                    if rpn[0].isnumeric() and rpn[1].isnumeric():
-                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
-                        file.write("\t\tlw " + str(savedTemporary[1]) + ", " + str(dataArray.pop(0)) + "\n")
+                    if rpn[i-2 -poped].isnumeric() and rpn[i-1 - poped].isnumeric():
+                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(i-2-poped)) + "\n")
+                        file.write("\t\tlw " + str(savedTemporary[1]) + ", " + str(dataArray.pop(i-2-poped)) + "\n")
                         temporaryUsed.append(temporary.pop(0))
                         file.write("\t\tmul " + str(temporaryUsed[count]) + ", " + str(savedTemporary[0]) + ", " + str(
                             savedTemporary[1]) + "\n")
+                        count += 1
                         try:
-                            for j in range(i + 1, 0, -1):
-                                rpn.pop(0)
+                            for j in range(i-poped, i-poped-3, -1):
+                                rpn.pop(j)
+                                poped += 1
                                 print(str(rpn) + '*')
                         except Exception:
                             print('..')
@@ -68,22 +73,28 @@ def dataWrite():     #essa funcao ira escrever no arquivo
                         file.write("\t\tmul " + str(temporaryUsed[0]) + ", " + str(temporaryUsed[0]) + ", " + str(
                             savedTemporary[0]) + "\n")
                         sizeArray = len(rpn)
-                        for j in range(i, sizeArray, -1):      #for j in range(i, rpn[0], -1):
+                        for j in range(i - poped, i - poped - 2, -1):  #for j in range(i, rpn[0], -1):
                             rpn.pop(0)
+                            poped += 1
                             print(str(rpn) + '*')
 
 
             if sya[i] == "/":
+                print(str(rpn) + '/')
                 if len(rpn) != 0:
-                    if rpn[0].isnumeric() and rpn[1].isnumeric():
-                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
-                        file.write("\t\tlw " + str(savedTemporary[1]) + ", " + str(dataArray.pop(0)) + "\n")
+                    if rpn[i - 2 - poped].isnumeric() and rpn[i - 1 - poped].isnumeric():
+                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(i-2-poped)) + "\n")
+                        file.write("\t\tlw " + str(savedTemporary[1]) + ", " + str(dataArray.pop(i-2-poped)) + "\n")
                         temporaryUsed.append(temporary.pop(0))
+                        print(count)
                         file.write("\t\tdiv " + str(temporaryUsed[count]) + ", " + str(savedTemporary[0]) + ", " + str(
                             savedTemporary[1]) + "\n")
+                        count += 1
                         try:
-                            for j in range(i + 1, 0, -1):
-                                rpn.pop(0)
+                            print(i-poped)
+                            for j in range(i-poped, i-poped-3, -1):
+                                rpn.pop(j)
+                                poped += 1
                                 print(str(rpn) + '/')
                         except Exception:
                             print('..')
@@ -95,22 +106,25 @@ def dataWrite():     #essa funcao ira escrever no arquivo
                         file.write("\t\tdiv " + str(temporaryUsed[0]) + ", " + str(temporaryUsed[0]) + ", " + str(
                             savedTemporary[0]) + "\n")
                         sizeArray = len(rpn)
-                        for j in range(i, sizeArray, -1):      #for j in range(i, rpn[0], -1):
+                        for j in range(i - poped, i - poped - 2, -1):  #for j in range(i, rpn[0], -1):
                             rpn.pop(0)
+                            poped += 1
                             print(str(rpn) + '/')
 
             if sya[i] == "+":
+                print(str(rpn) + '+')
                 if len(rpn) > 1:
-                    if rpn[0].isnumeric() and rpn[1].isnumeric():
-                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
-                        file.write("\t\tlw " + str(savedTemporary[1]) + ", " + str(dataArray.pop(0)) + "\n")
+                    if rpn[i - 2 - poped].isnumeric() and rpn[i - 1 - poped].isnumeric():
+                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(i-2-poped)) + "\n")
+                        file.write("\t\tlw " + str(savedTemporary[1]) + ", " + str(dataArray.pop(i-2-poped)) + "\n")
                         temporaryUsed.append(temporary.pop(0))
-                        print(temporaryUsed)
                         file.write("\t\tadd " + str(temporaryUsed[count]) + ", " + str(savedTemporary[0]) + ", " + str(
                             savedTemporary[1]) + "\n")
+                        count += 1
                         try:
-                            for j in range(i + 1, 0, -1):
-                                rpn.pop(0)
+                            for j in range(i-poped, i-poped-3, -1):
+                                rpn.pop(j)
+                                poped += 1
                                 print(str(rpn) + '+')
                         except Exception:
                             print('..')
@@ -121,23 +135,27 @@ def dataWrite():     #essa funcao ira escrever no arquivo
                         file.write("\t\tadd " + str(temporaryUsed[0]) + ", " + str(temporaryUsed[0]) + ", " + str(
                             savedTemporary[0]) + "\n")
                         sizeArray = len(rpn)
-                        for j in range(i, sizeArray, -1):      #for j in range(i, rpn[0], -1):
+                        for j in range(i-poped, i-poped-2, -1):      #for j in range(i, rpn[0], -1):
                             rpn.pop(0)
+                            poped += 1
                 if len(temporaryUsed) > 1:
                     file.write("\t\tadd " + str(temporaryUsed[0]) + ", " + str(temporaryUsed.pop(0)) + ", " + str(
                         temporaryUsed.pop(0)) + "\n")
 
             if sya[i] == "-":
+                print(str(rpn) + '-')
                 if len(rpn) > 1:
-                    if rpn[0].isnumeric() and rpn[1].isnumeric():
-                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
-                        file.write("\t\tlw " + str(savedTemporary[1]) + ", " + str(dataArray.pop(0)) + "\n")
+                    if rpn[i - 2 - poped].isnumeric() and rpn[i - 1 - poped].isnumeric():
+                        file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(i-2-poped)) + "\n")
+                        file.write("\t\tlw " + str(savedTemporary[1]) + ", " + str(dataArray.pop(i-2-poped)) + "\n")
                         temporaryUsed.append(temporary.pop(0))
                         file.write("\t\tsub " + str(temporaryUsed[count]) + ", " + str(savedTemporary[0]) + ", " + str(
                             savedTemporary[1]) + "\n")
+                        count += 1
                         try:
-                            for j in range(i + 1, 0, -1):
-                                rpn.pop(0)
+                            for j in range(i-poped, i-poped-3, -1):
+                                rpn.pop(j)
+                                poped += 1
                                 print(str(rpn) + '-')
                         except Exception:
                             print('..')
@@ -148,13 +166,14 @@ def dataWrite():     #essa funcao ira escrever no arquivo
                         file.write("\t\tsub " + str(temporaryUsed[0]) + ", " + str(temporaryUsed[0]) + ", " + str(
                             savedTemporary[0]) + "\n")
                         sizeArray = len(rpn)
-                        for j in range(i, sizeArray, -1):      #for j in range(i, rpn[0], -1):
+                        for j in range(i - poped, i - poped - 2, -1):  #for j in range(i, rpn[0], -1):
                             print(str(rpn) + '-')
                             rpn.pop(0)
+                            poped += 1
                 if len(temporaryUsed) > 1:
                     file.write("\t\tsub " + str(temporaryUsed[0]) + ", " + str(temporaryUsed.pop(0)) + ", " + str(
                         temporaryUsed.pop(0)) + "\n")
-            count += 1
+            #count += 1
 
     file.write("\t\tli $v0, 1\n\t\tmove $a0, $t0\n\t\tsyscall")
     file.close()
