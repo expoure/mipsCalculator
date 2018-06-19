@@ -21,8 +21,8 @@ def dataWrite():     #essa funcao ira escrever no arquivo
     file = open("calc.asm", "a+")
     file.write("\n.data\n")
     for i in range(0, len(operands)): #vai carregar o word de acordo com os numeros do vetor ordenado
-        file.write("\t" + az[0][i] + ": .word " + str(operandsInOrder[i]) + "\n")  #pega a letra do alfabeto de acordo com a necessidade e refere ao operando
-        dataArray.append(az[0][i])
+        file.write("\t" + az[0][i] + ": .word " + str(operandsInOrder[i]) + "\n") #utiliza vetor de alfabeto de acordo com necessidade
+        dataArray.append(az[0][i]) #letra vai para vetor de variaveis usadas
     file.write("\n.text\n\tmain:\n")    #adiciona a parte .text e main:
 
     for i in range(0, len(sya)): #vai varrer a lista padrao
@@ -33,8 +33,8 @@ def dataWrite():     #essa funcao ira escrever no arquivo
                 if len(rpn) != 0:
                     if rpn[0].isnumeric():
                         file.write("\t\tlw " + "$s0" + ", " + str(dataArray.pop(0)) + "\n")
-                        file.write("\t\taddi $s1,$zero, 1\n\t\taddi $s2,$zero, 2\n\t\tli $s3, 268500992\n\t\tadd $t2,$zero, $s1\n\t\tlw $t3, a\n\t\tadd $s4, $s0, $s1"
-                                   "\n\t\tslt $t0,$s0,$s2\n\t\t\tbeq $t0,$zero,LOOP\n\t\t\tj LSair"
+                        file.write("\t\taddi $s1,$zero, 1\n\t\taddi $s2,$zero, 2\n\t\tli $s3, 268500992\n\t\tadd $t2,$zero, $s1"
+                                   "\n\t\tlw $t3, a\n\t\tadd $s4, $s0, $s1\n\t\tslt $t0,$s0,$s2\n\t\t\tbeq $t0,$zero,LOOP\n\t\t\tj LSair"
                                    "\nLOOP:\n\t\taddi $t4, $t4, 1\n\t\t\tslt $t0, $t4, $s4\n\t\t\tbeq $t0, $zero, LSair\n\t\tmul $t2, $t2, $t4"
                                    "\n\t\tj LOOP\nLSair:\n\t\tsw $t2, ($s3)\n\t\tli $v0, 1\n\t\tmove $a0, $t2\n\t\tsyscall")
                         exit()
@@ -66,7 +66,6 @@ def dataWrite():     #essa funcao ira escrever no arquivo
                             print('..')
 
                     else:
-                        print(i)
                         file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
                         file.write("\t\tmul " + str(temporaryUsed[0]) + ", " + str(temporaryUsed[0]) + ", " + str(
                             savedTemporary[0]) + "\n")
@@ -96,7 +95,6 @@ def dataWrite():     #essa funcao ira escrever no arquivo
                             print('..')
 
                     else:
-                        print(i)
                         file.write("\t\tlw " + str(savedTemporary[0]) + ", " + str(dataArray.pop(0)) + "\n")
                         file.write("\t\tdiv " + str(temporaryUsed[0]) + ", " + str(temporaryUsed[0]) + ", " + str(
                             savedTemporary[0]) + "\n")
@@ -167,7 +165,6 @@ def dataWrite():     #essa funcao ira escrever no arquivo
                 if len(temporaryUsed) > 1:
                     file.write("\t\tsub " + str(temporaryUsed[0]) + ", " + str(temporaryUsed.pop(0)) + ", " + str(
                         temporaryUsed.pop(0)) + "\n")
-            #count += 1
 
     file.write("\t\tli $v0, 1\n\t\tmove $a0, $t0\n\t\tsyscall")
     file.close()
@@ -179,22 +176,13 @@ file = open("calc.asm", "w+")
 file.write("#" + presentation)
 file.close()
 
-operators = []  #lista dinamica dos operadores
-operators_index = []    #lista dinamica do indice dos operadores
 operandsFromString = []     #lista dinamica dos operandos
 az = ["abcdefghijklmnopqrstuvwxyz"]
 rpn = []
-exp = []
 expression = input("Entre com o calculo a ser realizado: ")
 
-
-for i in range(0, len(expression)):     #aqui ele 'escaneia' a string em busca de operadores
-    if not ((expression[i].isnumeric()) or (expression[i].isspace()) or (expression[i] == "(") or (expression[i] == ")")):
-        operators.append(expression[i])     #adiciona operadores na lista
-        operators_index.append(i)       #adiciona o indice dos operadores na lista
 operandsFromString.append(re.findall('\d+', expression))     #faz uma lista com operandos
 operands = operandsFromString.pop()     #pega sub vetor e passa para vetor normal
-
 
 sya = shuntingYardAlgorithm.rpn(expression)
 
